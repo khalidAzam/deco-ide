@@ -41,6 +41,7 @@ import systemPathInitializer from './fs/systemPathInitializer'
 import Logger from './log/logger'
 
 import { registerHandlers, } from './handlers'
+import installDevTools from './utils/devTools'
 
 // Allows us to operate without error in browser
 var electronRequire = require('electron')
@@ -74,6 +75,8 @@ app.on('ready', function() {
   //set the work area size for window manager
   global.workArea = size
   const version = app.getVersion()
+
+  installDevTools()
 
   WindowManager.checkNeedsUpgrade(version).then(() => {
     //initialize browser window!
