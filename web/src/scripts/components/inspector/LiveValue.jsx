@@ -41,17 +41,19 @@ export default class extends Component {
     metadata: React.PropTypes.object.isRequired,
     onChange: React.PropTypes.func.isRequired,
     onMetadataChange: React.PropTypes.func,
+    onDelete: React.PropTypes.func,
     inset: React.PropTypes.number,
     width: React.PropTypes.number,
   }
 
   static defaultProps = {
     inset: 0,
+    deletable: false,
     onMetadataChange: () => {},
   }
 
   render() {
-    const {id, value, metadata, onChange, onMetadataChange, inset, width} = this.props
+    const {id, value, metadata, onChange, onMetadataChange, onDelete, deletable, disabledFields, inset, width} = this.props
     const {name} = metadata
 
     let inputElement
@@ -133,11 +135,14 @@ export default class extends Component {
         inset={inset}
         width={width}
         inputElement={inputElement}
+        deletable={deletable}
+        onDelete={onDelete}
         menuElement={(
           <MetadataEditor
             id={id}
             metadata={metadata}
             onMetadataChange={onMetadataChange}
+            disabledFields={disabledFields}
           />
         )}
       />

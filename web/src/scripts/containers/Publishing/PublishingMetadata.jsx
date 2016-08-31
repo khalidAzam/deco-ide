@@ -228,6 +228,7 @@ class PublishingMetadata extends Component {
                 width={width}
                 inset={INSET_WIDTH}
                 disabledFields={['group']}
+                deletable={true}
                 onChange={(value) => {
                   const updated = _.cloneDeep(component)
                   updated.props[i].defaultValue = value
@@ -237,6 +238,12 @@ class PublishingMetadata extends Component {
                 onMetadataChange={(key, value) => {
                   const updated = _.cloneDeep(component)
                   updated.props[i][key] = value
+                  this.setState({component: updated})
+                  this.save(updated)
+                }}
+                onDelete={(value) => {
+                  const updated = _.cloneDeep(component)
+                  updated.props.splice(i, 1)
                   this.setState({component: updated})
                   this.save(updated)
                 }}

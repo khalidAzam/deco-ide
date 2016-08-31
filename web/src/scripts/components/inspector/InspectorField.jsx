@@ -23,6 +23,42 @@ import Menu from '../menu/Menu'
 
 const INPUT_WIDTH = 115
 
+const styles = {
+  removeProperty: {
+    position: 'relative',
+    top: -1,
+    cursor: 'default',
+    marginLeft: 10,
+    width: 10,
+    height: 26,
+    WebkitMaskSize: '30px 17px',
+    WebkitMaskPosition: 'center',
+    WebkitMaskRepeat: 'no-repeat',
+    WebkitMaskImage: `-webkit-image-set(` +
+      `url('./icons/icon-trash.png') 1x, ` +
+      `url('./icons/icon-trash@2x.png') 2x` +
+    `)`,
+    backgroundColor: 'rgb(187,187,187)',
+  },
+  inputContainer: {
+    flex: 1,
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'stretch',
+    minHeight: 0,
+    minWidth: 0,
+    position: 'relative',
+  },
+  inputElement: {
+    flex: 1,
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'stretch',
+    minHeight: 0,
+    minWidth: 0,
+  },
+}
+
 export default class extends Component {
 
   static propTypes = {
@@ -30,16 +66,19 @@ export default class extends Component {
     width: React.PropTypes.number,
     inputElement: React.PropTypes.any,
     menuElement: React.PropTypes.element.isRequired,
+    deletable: React.PropTypes.bool,
   }
 
   static defaultProps = {
     inset: 0,
+    deletable: false,
   }
 
   constructor(props) {
     super(props)
 
     this.state = {
+      hover: false,
       showMenu: false,
       menuPosition: { x: 0, y: 0 },
     }
@@ -58,8 +97,8 @@ export default class extends Component {
   }
 
   render() {
-    const {name, inset, width, inputElement, menuElement} = this.props
-    const {showMenu, caretOffset, menuPosition} = this.state
+    const {name, inset, width, inputElement, menuElement, deletable, onDelete} = this.props
+    const {showMenu, caretOffset, menuPosition, hover} = this.state
 
     return (
       <FormRow
@@ -77,7 +116,12 @@ export default class extends Component {
           })
         }}
       >
-        {inputElement}
+        <div style={styles.inputElement}>
+          {inputElement}
+        </div>
+        {deletable && (
+          <div style={styles.removeProperty} onClick={onDelete} />
+        )}
         <Menu show={showMenu}
           caret={true}
           caretOffset={caretOffset}
