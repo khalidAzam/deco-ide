@@ -23,6 +23,7 @@ import PublishingSignIn from './PublishingSignIn'
 import PublishingBrowser from './PublishingBrowser'
 import PublishingMetadata from './PublishingMetadata'
 import {PaneHeader} from '../../components'
+import DecoClient from '../../api/DecoClient'
 
 const styles = {
   container: {
@@ -37,35 +38,75 @@ const styles = {
   }
 }
 
-const PublishingInspector = ({signedIn, user, components, currentComponentId, width}) => {
-  const currentComponent = currentComponentId ?
-    _.find(components, ['id', currentComponentId]) : null
+class Publishing extends Component {
+  constructor(props) {
+    super()
 
-  return (
-    <div style={styles.container}>
-      <PaneHeader
-        text={'Publishing'}
-        rightTitle={signedIn ? 'Sign out' : null}
-        onClickRightTitle={() => {console.log('Sign out?')}}
-      />
-      {signedIn ? (
-        currentComponent ? (
-          <PublishingMetadata
-            user={user}
-            component={currentComponent}
-            width={width}
-          />
+    this.state = {
+      components: [],
+      currentComponentId: null,
+    }
+
+    DecoClient.getComponents().then((components) => this.setState({components}))
+  }
+
+  render() {
+    const {components, currentComponentId} = this.state
+    const {signedIn, user, width} = this.props
+
+    const currentComponent = currentComponentId ?
+      _.find(components, ['id', currentComponentId]) : null
+
+    console.log(currentComponent)
+
+    return (
+      <div style={styles.container}>
+        <PaneHeader
+          text={'Publishing'}
+          leftTitle={currentComponent ? 'Back' : null}
+          onClickLeftTitle={(() => {
+            this.setState({currentComponentId: null})
+          })}
+          rightTitle={signedIn ? 'Sign out' : null}
+          onClickRightTitle={() => {
+            console.log('Sign out?')
+          }}
+        />
+        {signedIn ? (
+          currentComponent ? (
+            <PublishingMetadata
+              user={user}
+              component={currentComponent}
+              width={width}
+            />
+          ) : (
+            <PublishingBrowser
+              user={user}
+              components={components}
+              onSelectComponent={(currentComponentId) => {
+                console.log(currentComponentId)
+                this.setState({currentComponentId})
+              }}
+              onCreateComponent={() => {
+                console.log('onCreateComponent')
+                DecoClient.createComponent()
+                  .then(component => {
+                    const {id} = component
+
+                    this.setState({
+                      components: [...this.state.components, component],
+                      currentComponentId: id,
+                    })
+                  })
+              }}
+            />
+          )
         ) : (
-          <PublishingBrowser
-            user={user}
-            components={components}
-          />
-        )
-      ) : (
-        <PublishingSignIn />
-      )}
-    </div>
-  )
+          <PublishingSignIn />
+        )}
+      </div>
+    )
+  }
 }
 
 const mapStateToProps = (state) => {
@@ -77,7 +118,7 @@ const mapStateToProps = (state) => {
       lastname: 'Abbott',
       thumbnail: 'https://avatars0.githubusercontent.com/u/1198882?v=3&s=460',
     },
-    currentComponentId: '1',
+    // currentComponentId: '1',
     components: [
       {
         name: 'Button',
@@ -125,4 +166,4 @@ const mapStateToProps = (state) => {
   }
 }
 
-export default connect(mapStateToProps)(PublishingInspector)
+export default connect(mapStateToProps)(Publishing)

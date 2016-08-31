@@ -15,8 +15,12 @@
  *
  */
 
+import _ from 'lodash'
 import React, { Component, } from 'react'
 import { connect } from 'react-redux'
+
+import DecoClient from '../../api/DecoClient'
+import { createJSX } from '../../factories/module/TemplateFactory'
 
 import {
   FormRow,
@@ -68,26 +72,30 @@ const styles = {
 }
 
 class PublishingMetadata extends Component {
-  constructor() {
+  constructor(props) {
     super()
 
-    this.state = {}
+    const {component} = props
+
+    this.state = {
+      component: _.cloneDeep(component),
+    }
   }
 
   renderCode(component) {
-    const {props, dependencies, imports} = component
+    const {tagName, props, dependencies, imports} = component
 
-    const createJSX = () => {
-      return [
-        '<Button',
-        ..._.map(props, ({value, metadata: {name}}) => `  ${name}={${value}}`),
-        '/>',
-      ].join('\n')
-    }
+    console.log('tagName', tagName, 'props', props)
 
     const chunks = [
-      _.map(imports, (value, key) => `import ${value} from ${key}`).join('\n'),
-      createJSX(),
+      _.map(imports, (value, key) => {
+        if (_.isString(value)) {
+          return `import ${value} from ${key}`
+        } else if (_.isArray(value)) {
+          return `import { ${value.join(', ')} } from ${key}`
+        }
+      }).join('\n'),
+      createJSX({name: tagName, props}),
     ]
 
     return (
@@ -122,9 +130,15 @@ class PublishingMetadata extends Component {
     })
   }
 
+  save(component) {
+    DecoClient.updateComponent(component, component.id)
+      .then(() => console.log('updated component!'))
+  }
+
   render() {
-    const {width, component} = this.props
-    const {props: componentProps, dependencies, imports} = component
+    const {width} = this.props
+    const {component} = this.state
+    const {props: componentProps = [], dependencies, imports} = component
 
     const rowDimensions = {
       labelWidth: width - INPUT_WIDTH - 10,
@@ -138,7 +152,7 @@ class PublishingMetadata extends Component {
           <div style={styles.padded}>
             <InspectorButton>Scan Current File</InspectorButton>
           </div>
-          <FormHeader label={'COMPONENT FILES'} />
+          {/* <FormHeader label={'COMPONENT FILES'} />
           <FormRow label={'Entry file'} {...rowDimensions}>
             <FileSelectorInput
               value={'./Button'}
@@ -147,9 +161,9 @@ class PublishingMetadata extends Component {
               width={INPUT_WIDTH}
             />
           </FormRow>
-          <div style={{marginBottom: 20}} />
+          <div style={{marginBottom: 20}} /> */}
           <FormHeader label={'METADATA'} />
-          <FormRow label={'Package / Import name'} {...rowDimensions}>
+          {/* <FormRow label={'Package / Import name'} {...rowDimensions}>
             <StringInput
               value={'react-native-button'}
               onChange={(value) => {console.log('value', value)}}
@@ -160,42 +174,81 @@ class PublishingMetadata extends Component {
               value={'dabbott/button'}
               onChange={(value) => {console.log('value', value)}}
             />
-          </FormRow>
-          <FormRow label={'Tagname'} {...rowDimensions}>
+          </FormRow> */}
+          <FormRow label={'Name'} {...rowDimensions}>
             <StringInput
-              value={'Button'}
-              onChange={(value) => {console.log('value', value)}}
+              value={component.name}
+              onChange={(value) => {
+                const updated = _.cloneDeep(component)
+                updated.name = value
+                this.setState({component: updated})
+                this.save(updated)
+              }}
+            />
+          </FormRow>
+          <FormRow label={'JSX Tag'} {...rowDimensions}>
+            <StringInput
+              value={component.tagName}
+              onChange={(value) => {
+                const updated = _.cloneDeep(component)
+                updated.tagName = value
+                this.setState({component: updated})
+                this.save(updated)
+              }}
             />
           </FormRow>
           <div style={{marginBottom: 20}} />
           <FormHeader label={'PROPS'}>
             <FormHeaderPlusButton
-              onClick={() => {console.log('add prop')}}
+              onClick={() => {
+                const updated = _.cloneDeep(component)
+                if (!updated.props) {
+                  updated.props = []
+                }
+                updated.props.push({
+                  name: 'hello',
+                  type: 'string',
+                  editWith: 'inputField',
+                  defaultValue: 'world',
+                })
+                this.setState({component: updated})
+                this.save(updated)
+              }}
             />
           </FormHeader>
-          {componentProps.map(({value, metadata}, i) => {
-            const {name} = metadata
+          {componentProps.map((prop, i) => {
+            const {name, defaultValue: value} = prop
 
             return (
               <LiveValue
+                key={i}
                 id={name}
-                key={name}
                 value={value}
-                metadata={metadata}
+                metadata={prop}
                 width={width}
                 inset={INSET_WIDTH}
                 disabledFields={['group']}
-                onChange={(value) => {console.log('change', value)}}
-                onMetadataChange={(value) => {console.log('meta change', value)}}
+                onChange={(value) => {
+                  const updated = _.cloneDeep(component)
+                  updated.props[i].defaultValue = value
+                  this.setState({component: updated})
+                  this.save(updated)
+                }}
+                onMetadataChange={(key, value) => {
+                  const updated = _.cloneDeep(component)
+                  updated.props[i][key] = value
+                  this.setState({component: updated})
+                  this.save(updated)
+                }}
               />
             )
           })}
-          <div style={{marginBottom: 20}} />
+          {/* <div style={{marginBottom: 20}} />
           <FormHeader label={'DEPENDENCIES'} />
-          {this.renderMap(dependencies)}
-          <div style={{marginBottom: 20}} />
+          {this.renderMap(dependencies)} */}
+          {/* <div style={{marginBottom: 20}} />
           <FormHeader label={'IMPORTS'} />
-          {this.renderMap(imports)}
+          {this.renderMap(imports)} */}
         </div>
         <div style={styles.footer}>
           {this.renderCode(component)}

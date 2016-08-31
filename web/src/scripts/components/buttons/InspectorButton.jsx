@@ -99,6 +99,7 @@ export default class extends Component {
 
     return (
       <SimpleButton
+        {...this.props}
         defaultStyle={base}
         activeStyle={{...base, ...active}}
         hoverStyle={{...base, ...hover}}

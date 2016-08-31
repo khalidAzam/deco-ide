@@ -46,7 +46,7 @@ const styles = {
   },
 }
 
-const PublishingBrowser = ({user, components}) => {
+const PublishingBrowser = ({user, components, onSelectComponent, onCreateComponent}) => {
   const {firstname, lastname, username, thumbnail} = user
   const downloadCount = components.reduce((sum, component) => sum + component.downloads, 0)
 
@@ -61,14 +61,16 @@ const PublishingBrowser = ({user, components}) => {
         downloadCount={downloadCount}
       />
       <div style={styles.inner}>
-        <InspectorButton type={'main'}>New Component</InspectorButton>
+        <InspectorButton type={'main'} onClick={onCreateComponent}>
+          New Component
+        </InspectorButton>
         <div style={{marginBottom: 20}} />
         <div style={styles.header}>Published Components</div>
-        {components.map(({name, repository}, i) => {
+        {components.map(({name, repository, id}, i) => {
           const style = {marginBottom: i === components.length ? 0 : 10}
 
           return (
-            <div style={style} key={repository}>
+            <div style={style} key={id} onClick={onSelectComponent.bind(null, id)}>
               <InspectorButton align={'left'}>
                 {name}<span style={styles.componentDetails}> | {repository}</span>
               </InspectorButton>
