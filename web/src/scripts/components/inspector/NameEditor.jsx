@@ -41,6 +41,16 @@ export default class extends Component {
     requestClose: () => {},
   }
 
+  constructor(props) {
+    super()
+
+    const {name} = props
+
+    this.state = {
+      inProgress: null,
+    }
+  }
+
   componentDidMount() {
     const nameElement = ReactDOM.findDOMNode(this.refs.nameInput)
 
@@ -51,20 +61,34 @@ export default class extends Component {
   }
 
   render() {
-    const {name, onChange, requestClose} = this.props
+    const {name, onChange, requestClose, withConfirmation} = this.props
+    const {inProgress} = this.state
 
     return (
       <div style={menuStyle}>
         <FormRow
-          label={'Name'}
+          label={withConfirmation && inProgress !== null ? '↵ to confirm' : 'Name'}
           inputWidth={INPUT_WIDTH}
         >
-          <StringInput
-            ref={'nameInput'}
-            value={name}
-            onChange={onChange}
-            onSubmit={requestClose}
-          />
+          {withConfirmation ? (
+            <StringInput
+              ref={'nameInput'}
+              value={inProgress || name || ''}
+              onChange={(value) => this.setState({inProgress: value})}
+              onSubmit={(value) => {
+                this.setState({inProgress: null})
+                onChange(value)
+                requestClose()
+              }}
+            />
+          ) : (
+            <StringInput
+              ref={'nameInput'}
+              value={name}
+              onChange={onChange}
+              onSubmit={requestClose}
+            />
+          )}
         </FormRow>
       </div>
     )

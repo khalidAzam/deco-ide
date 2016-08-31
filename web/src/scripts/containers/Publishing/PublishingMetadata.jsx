@@ -85,8 +85,6 @@ class PublishingMetadata extends Component {
   renderCode(component) {
     const {tagName, props, dependencies, imports} = component
 
-    console.log('tagName', tagName, 'props', props)
-
     const chunks = [
       _.map(imports, (value, key) => {
         if (_.isString(value)) {
@@ -103,28 +101,59 @@ class PublishingMetadata extends Component {
     )
   }
 
-  renderMap(map) {
+  renderMap(map, mapName) {
+    const {component} = this.state
     const {width} = this.props
 
     return _.map(map, (value, key) => {
+      let inputElement
+
+      if (_.isString(value)) {
+        inputElement = (
+          <StringInput
+            value={value}
+            onChange={(newValue) => this.updateComponent(c => c[mapName][key] = newValue)}
+          />
+        )
+      } else if (_.isArray(value)) {
+        inputElement = (
+          <StringInput
+            value={value.join(',')}
+            onChange={(newValue) => {
+              this.updateComponent(c => {
+                try {
+                  const parts = newValue.split(',')
+                  c[mapName][key] = parts
+                } catch (e) {
+                  console.log('failed to change', value, '=>', newValue)
+                }
+              })
+            }}
+          />
+        )
+      }
+
       return (
         <InspectorField
           key={key}
           name={key}
           inset={INSET_WIDTH}
           width={width}
-          inputElement={(
-            <StringInput
-              value={value}
-              onChange={(value) => {console.log('value', value)}}
-            />
-          )}
+          deletable={true}
+          inputElement={inputElement}
           menuElement={(
             <NameEditor
               name={key}
-              onChange={(value) => {console.log('name change', value)}}
+              withConfirmation={true}
+              onChange={(newKey) => {
+                this.updateComponent(c => {
+                  delete c[mapName][key]
+                  c[mapName][newKey] = value
+                })
+              }}
             />
           )}
+          onDelete={() => this.updateComponent(c => delete c[mapName][key])}
         />
       )
     })
@@ -133,6 +162,14 @@ class PublishingMetadata extends Component {
   save(component) {
     DecoClient.updateComponent(component, component.id)
       .then(() => console.log('updated component!'))
+  }
+
+  updateComponent(updater) {
+    const {component} = this.state
+    const clone = _.cloneDeep(component)
+    updater(clone)
+    this.setState({component: clone})
+    this.save(clone)
   }
 
   render() {
@@ -178,41 +215,34 @@ class PublishingMetadata extends Component {
           <FormRow label={'Name'} {...rowDimensions}>
             <StringInput
               value={component.name}
-              onChange={(value) => {
-                const updated = _.cloneDeep(component)
-                updated.name = value
-                this.setState({component: updated})
-                this.save(updated)
-              }}
+              onChange={(value) => this.updateComponent(c => c.name = value)}
             />
           </FormRow>
           <FormRow label={'JSX Tag'} {...rowDimensions}>
             <StringInput
               value={component.tagName}
-              onChange={(value) => {
-                const updated = _.cloneDeep(component)
-                updated.tagName = value
-                this.setState({component: updated})
-                this.save(updated)
-              }}
+              onChange={(value) => this.updateComponent(c => c.tagName = value)}
+            />
+          </FormRow>
+          <FormRow label={'Description'} {...rowDimensions}>
+            <StringInput
+              value={component.description}
+              onChange={(value) => this.updateComponent(c => c.description = value)}
             />
           </FormRow>
           <div style={{marginBottom: 20}} />
           <FormHeader label={'PROPS'}>
             <FormHeaderPlusButton
               onClick={() => {
-                const updated = _.cloneDeep(component)
-                if (!updated.props) {
-                  updated.props = []
-                }
-                updated.props.push({
-                  name: 'hello',
-                  type: 'string',
-                  editWith: 'inputField',
-                  defaultValue: 'world',
+                this.updateComponent(c => {
+                  c.props = c.props || []
+                  c.props.push({
+                    name: 'hello',
+                    type: 'string',
+                    editWith: 'inputField',
+                    defaultValue: 'world',
+                  })
                 })
-                this.setState({component: updated})
-                this.save(updated)
               }}
             />
           </FormHeader>
@@ -229,33 +259,44 @@ class PublishingMetadata extends Component {
                 inset={INSET_WIDTH}
                 disabledFields={['group']}
                 deletable={true}
-                onChange={(value) => {
-                  const updated = _.cloneDeep(component)
-                  updated.props[i].defaultValue = value
-                  this.setState({component: updated})
-                  this.save(updated)
-                }}
-                onMetadataChange={(key, value) => {
-                  const updated = _.cloneDeep(component)
-                  updated.props[i][key] = value
-                  this.setState({component: updated})
-                  this.save(updated)
-                }}
-                onDelete={(value) => {
-                  const updated = _.cloneDeep(component)
-                  updated.props.splice(i, 1)
-                  this.setState({component: updated})
-                  this.save(updated)
-                }}
+                onChange={(value) => this.updateComponent(c => c.props[i].defaultValue = value)}
+                onMetadataChange={(key, value) => this.updateComponent(c => c.props[i][key] = value)}
+                onDelete={(value) => this.updateComponent(c => c.props.splice(i, 1))}
               />
             )
           })}
-          {/* <div style={{marginBottom: 20}} />
-          <FormHeader label={'DEPENDENCIES'} />
-          {this.renderMap(dependencies)} */}
-          {/* <div style={{marginBottom: 20}} />
-          <FormHeader label={'IMPORTS'} />
-          {this.renderMap(imports)} */}
+          <div style={{marginBottom: 20}} />
+          <FormHeader label={'DEPENDENCIES'}>
+            <FormHeaderPlusButton
+              onClick={() => {
+                this.updateComponent(c => {
+                  c.dependencies = c.dependencies || {}
+                  let newDependencyName = 'left-pad'
+                  while (typeof c.dependencies[newDependencyName] !== 'undefined') {
+                    newDependencyName += '-copy'
+                  }
+                  c.dependencies[newDependencyName] = '^1.1.1'
+                })
+              }}
+            />
+          </FormHeader>
+          {this.renderMap(dependencies, 'dependencies')}
+          <div style={{marginBottom: 20}} />
+          <FormHeader label={'IMPORTS'}>
+            <FormHeaderPlusButton
+              onClick={() => {
+                this.updateComponent(c => {
+                  c.imports = c.imports || {}
+                  let newImportName = 'react-native'
+                  while (typeof c.imports[newImportName] !== 'undefined') {
+                    newImportName += '-copy'
+                  }
+                  c.imports[newImportName] = ['View']
+                })
+              }}
+            />
+          </FormHeader>
+          {this.renderMap(imports, 'imports')}
         </div>
         <div style={styles.footer}>
           {this.renderCode(component)}
