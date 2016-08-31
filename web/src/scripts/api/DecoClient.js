@@ -26,7 +26,7 @@ const defaultComponent = {
   },
 }
 
-class DecoClient {
+export default class {
   static getComponents() {
     return http.get('/components')
     .then(components => {
@@ -44,5 +44,3 @@ class DecoClient {
     return http.put(`/components/${id}`, null, payload)
   }
 }
-
-export default DecoClient
