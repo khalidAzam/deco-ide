@@ -37,7 +37,6 @@ import child_process from 'child_process'
 //DECO APP REQUIRES
 import WindowManager from './window/windowManager'
 import MenuHandler from './menu/menuHandler'
-import systemPathInitializer from './fs/systemPathInitializer'
 import Logger from './log/logger'
 
 import { registerHandlers, } from './handlers'
@@ -64,8 +63,6 @@ app.on('ready', function() {
 
   Logger.info('Deco initializing...')
 
-  //initialize & validate the app data directory on launch
-  systemPathInitializer.init()
   //listen for ipc calls from renderer engine
   registerHandlers()
 
