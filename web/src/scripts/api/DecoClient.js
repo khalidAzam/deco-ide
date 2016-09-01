@@ -36,11 +36,31 @@ export default class {
     })
   }
 
-  static createComponent(payload = defaultComponent) {
-    return http.post('/components', null, payload)
+  static createComponent(component = defaultComponent) {
+    return http.post('/components', null, component)
   }
 
-  static updateComponent(payload, id) {
-    return http.put(`/components/${id}`, null, payload)
+  static updateComponent(component) {
+    const {id} = component
+
+    if (!id) {
+      throw new Error('Cannot update component - missing id')
+    }
+
+    // Remove id before sending
+    const clone = _.cloneDeep(component)
+    delete clone.id
+
+    return http.put(`/components/${id}`, null, clone)
+  }
+
+  static deleteComponent(component) {
+    const {id} = component
+
+    if (!id) {
+      throw new Error('Cannot update component - missing id')
+    }
+
+    return http.delete(`/components/${id}`)
   }
 }

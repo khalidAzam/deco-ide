@@ -24,6 +24,7 @@ import PublishingBrowser from './PublishingBrowser'
 import PublishingMetadata from './PublishingMetadata'
 import {PaneHeader} from '../../components'
 import DecoClient from '../../api/DecoClient'
+import { fetchComponents, createComponent, updateComponent, deleteComponent } from '../../actions/componentActions'
 
 const styles = {
   container: {
@@ -40,19 +41,20 @@ const styles = {
 
 class Publishing extends Component {
   constructor(props) {
+    const {dispatch} = props
+
     super()
 
     this.state = {
-      components: [],
       currentComponentId: null,
     }
 
-    DecoClient.getComponents().then((components) => this.setState({components}))
+    dispatch(fetchComponents())
   }
 
   render() {
-    const {components, currentComponentId} = this.state
-    const {signedIn, user, width} = this.props
+    const {currentComponentId} = this.state
+    const {dispatch, components, signedIn, user, width} = this.props
 
     const currentComponent = currentComponentId ?
       _.find(components, ['id', currentComponentId]) : null
@@ -78,25 +80,25 @@ class Publishing extends Component {
               user={user}
               component={currentComponent}
               width={width}
+              onUpdateComponent={(component) => dispatch(updateComponent(component))}
+              onDeleteComponent={(component) => {
+                dispatch(deleteComponent(component))
+                  .then(() => this.setState({currentComponentId: null}))
+              }}
             />
           ) : (
             <PublishingBrowser
               user={user}
               components={components}
               onSelectComponent={(currentComponentId) => {
-                console.log(currentComponentId)
                 this.setState({currentComponentId})
               }}
               onCreateComponent={() => {
-                console.log('onCreateComponent')
-                DecoClient.createComponent()
+                dispatch(createComponent())
                   .then(component => {
                     const {id} = component
 
-                    this.setState({
-                      components: [...this.state.components, component],
-                      currentComponentId: id,
-                    })
+                    this.setState({currentComponentId: id})
                   })
               }}
             />
@@ -111,6 +113,7 @@ class Publishing extends Component {
 
 const mapStateToProps = (state) => {
   return {
+    components: state.components.list,
     signedIn: true,
     user: {
       username: 'dabbott',
@@ -118,51 +121,6 @@ const mapStateToProps = (state) => {
       lastname: 'Abbott',
       thumbnail: 'https://avatars0.githubusercontent.com/u/1198882?v=3&s=460',
     },
-    // currentComponentId: '1',
-    components: [
-      {
-        name: 'Button',
-        id: '1',
-        repository: 'dabbott/button',
-        downloads: 214,
-        props: [
-          {
-            value: 'Press me!',
-            metadata: {
-              name: 'title',
-              type: 'string',
-              editWith: 'inputField',
-            },
-          },
-          {
-            value: 'rgb(210,210,210)',
-            metadata: {
-              name: 'textColor',
-              type: 'string',
-              editWith: 'colorPicker',
-            },
-          },
-        ],
-        dependencies: {
-          'react-native': '*',
-        },
-        imports: {
-          'react-native-button': 'Button',
-        },
-      },
-      {
-        name: 'PhotoGrid',
-        id: '2',
-        repository: 'dabbott/photo-grid',
-        downloads: 88,
-      },
-      {
-        name: 'Lightbox',
-        id: '3',
-        repository: 'dabbott/lightbox',
-        downloads: 43,
-      },
-    ],
   }
 }
 

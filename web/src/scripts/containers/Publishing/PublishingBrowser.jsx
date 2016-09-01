@@ -72,7 +72,7 @@ const PublishingBrowser = ({user, components, onSelectComponent, onCreateCompone
           return (
             <div style={style} key={id} onClick={onSelectComponent.bind(null, id)}>
               <InspectorButton align={'left'}>
-                {name}<span style={styles.componentDetails}> | {repository}</span>
+                {name}<span style={styles.componentDetails}>{/* | {repository}*/}</span>
               </InspectorButton>
             </div>
           )

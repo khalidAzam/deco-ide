@@ -92,7 +92,7 @@ class DraggableComponentMenuItem extends Component {
     }
     return connectDragSource(
       <div style={style}
-        titile={'Drag me into your code!'}
+        title={'Drag me into your code!'}
         onClick={this.handleClick.bind(this)}>
           <ComponentMenuItem {...this.props} />
           {

@@ -43,7 +43,6 @@ import EditorToast from '../components/editor/EditorToast'
 
 import { setConsoleVisibility, setConsoleScrollHeight } from '../actions/uiActions'
 import { stopPackager, runPackager, clearConfigError, setFlowError } from '../actions/applicationActions'
-import { importComponent, loadComponent } from '../actions/componentActions'
 import { insertComponent, insertTemplate } from '../actions/editorActions'
 import { closeTabWindow } from '../actions/compositeFileActions'
 import { fetchTemplateAndImportDependencies } from '../api/ModuleClient'
@@ -101,29 +100,28 @@ class TabbedEditor extends Component {
 
   onImportItem(item) {
     const {options} = this.props
-    this.props.dispatch(importComponent(item)).then((payload) => {
-      fetchTemplateAndImportDependencies(
-        item.dependencies,
-        item.template && item.template.text,
-        item.template && item.template.metadata,
-        this.props.rootPath,
-        this.props.npmRegistry,
-        item
-      ).then(({text, metadata}) => {
-        const {decoDoc} = this.props
 
-        if (! decoDoc) {
-          return
-        }
+    fetchTemplateAndImportDependencies(
+      item.dependencies,
+      item.template && item.template.text,
+      item.template && item.template.metadata,
+      this.props.rootPath,
+      this.props.npmRegistry,
+      item
+    ).then(({text, metadata}) => {
+      const {decoDoc} = this.props
 
-        this.props.dispatch(insertTemplate(
-          decoDoc,
-          text,
-          metadata,
-          item.imports,
-          _.get(item, 'inspector.group')
-        ))
-      })
+      if (! decoDoc) {
+        return
+      }
+
+      this.props.dispatch(insertTemplate(
+        decoDoc,
+        text,
+        metadata,
+        item.imports,
+        _.get(item, 'inspector.group')
+      ))
     })
   }
 

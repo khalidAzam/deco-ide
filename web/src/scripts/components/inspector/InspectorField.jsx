@@ -26,19 +26,18 @@ const INPUT_WIDTH = 115
 const styles = {
   removeProperty: {
     position: 'relative',
-    top: -1,
     cursor: 'default',
-    marginLeft: 10,
-    width: 10,
-    height: 26,
-    WebkitMaskSize: '30px 17px',
+    marginLeft: 9,
+    width: 9,
+    height: 12,
+    WebkitMaskSize: '9px 12px',
     WebkitMaskPosition: 'center',
     WebkitMaskRepeat: 'no-repeat',
     WebkitMaskImage: `-webkit-image-set(` +
-      `url('./icons/icon-trash.png') 1x, ` +
-      `url('./icons/icon-trash@2x.png') 2x` +
+      `url('./icons/icon-trash-small.png') 1x, ` +
+      `url('./icons/icon-trash-small@2x.png') 2x` +
     `)`,
-    backgroundColor: 'rgb(187,187,187)',
+    backgroundColor: 'rgb(180,180,180)',
   },
   inputContainer: {
     flex: 1,

@@ -39,4 +39,11 @@ export default class {
       body: JSON.stringify(body),
     })
   }
+
+  delete(endpoint, params) {
+    return fetch(this.createUrl(endpoint, params), {
+      method: 'DELETE',
+      headers: this.defaultHeaders,
+    })
+  }
 }

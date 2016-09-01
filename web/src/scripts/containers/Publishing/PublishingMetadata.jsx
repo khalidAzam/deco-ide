@@ -88,9 +88,9 @@ class PublishingMetadata extends Component {
     const chunks = [
       _.map(imports, (value, key) => {
         if (_.isString(value)) {
-          return `import ${value} from ${key}`
+          return `import ${value} from '${key}'`
         } else if (_.isArray(value)) {
-          return `import { ${value.join(', ')} } from ${key}`
+          return `import { ${value.join(', ')} } from '${key}'`
         }
       }).join('\n'),
       createJSX({name: tagName, props}),
@@ -159,21 +159,17 @@ class PublishingMetadata extends Component {
     })
   }
 
-  save(component) {
-    DecoClient.updateComponent(component, component.id)
-      .then(() => console.log('updated component!'))
-  }
-
   updateComponent(updater) {
+    const {onUpdateComponent} = this.props
     const {component} = this.state
     const clone = _.cloneDeep(component)
     updater(clone)
     this.setState({component: clone})
-    this.save(clone)
+    onUpdateComponent(clone)
   }
 
   render() {
-    const {width} = this.props
+    const {width, onDeleteComponent} = this.props
     const {component} = this.state
     const {props: componentProps = [], dependencies, imports} = component
 
@@ -302,6 +298,13 @@ class PublishingMetadata extends Component {
           {this.renderCode(component)}
           <div style={{marginBottom: 10}} />
           <InspectorButton type={'main'}>Publish Component</InspectorButton>
+          <div style={{marginBottom: 10}} />
+          <InspectorButton
+            type={'destructive'}
+            onClick={onDeleteComponent.bind(null, component)}
+          >
+            Delete Component
+          </InspectorButton>
         </div>
       </div>
     )

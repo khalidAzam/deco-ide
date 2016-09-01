@@ -1,81 +1,52 @@
-/**
- *    Copyright (C) 2015 Deco Software Inc.
- *
- *    This program is free software: you can redistribute it and/or modify
- *    it under the terms of the GNU Affero General Public License, version 3,
- *    as published by the Free Software Foundation.
- *
- *    This program is distributed in the hope that it will be useful,
- *    but WITHOUT ANY WARRANTY; without even the implied warranty of
- *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *    GNU Affero General Public License for more details.
- *
- *    You should have received a copy of the GNU Affero General Public License
- *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
- */
+import DecoClient from '../api/DecoClient'
 
-import request from '../ipc/Request'
+export const COMPONENTS_FETCH_REQUEST_PENDING = 'COMPONENTS_FETCH_REQUEST_PENDING'
+export const COMPONENTS_FETCH_REQUEST_SUCCESS = 'COMPONENTS_FETCH_REQUEST_SUCCESS'
+export const COMPONENTS_FETCH_REQUEST_FAILURE = 'COMPONENTS_FETCH_REQUEST_FAILURE'
 
-import ComponentConstants from 'shared/constants/ipc/ComponentConstants'
-const {
-  IMPORT_COMPONENT,
-  GET_COMPONENT_LIST,
-} = ComponentConstants
+export const COMPONENT_CREATE_REQUEST_PENDING = 'COMPONENT_CREATE_REQUEST_PENDING'
+export const COMPONENT_CREATE_REQUEST_SUCCESS = 'COMPONENT_CREATE_REQUEST_SUCCESS'
+export const COMPONENT_CREATE_REQUEST_FAILURE = 'COMPONENT_CREATE_REQUEST_FAILURE'
 
-export const ON_COMPONENT_LIST = 'ON_COMPONENT_LIST'
-export const _onComponentList = (list) => {
-  return {
-    type: ON_COMPONENT_LIST,
-    list: list,
-  }
+export const COMPONENT_UPDATE_REQUEST_PENDING = 'COMPONENT_UPDATE_REQUEST_PENDING'
+export const COMPONENT_UPDATE_REQUEST_SUCCESS = 'COMPONENT_UPDATE_REQUEST_SUCCESS'
+export const COMPONENT_UPDATE_REQUEST_FAILURE = 'COMPONENT_UPDATE_REQUEST_FAILURE'
+
+export const COMPONENT_DELETE_REQUEST_PENDING = 'COMPONENT_DELETE_REQUEST_PENDING'
+export const COMPONENT_DELETE_REQUEST_SUCCESS = 'COMPONENT_DELETE_REQUEST_SUCCESS'
+export const COMPONENT_DELETE_REQUEST_FAILURE = 'COMPONENT_DELETE_REQUEST_FAILURE'
+
+export const fetchComponents = () => (dispatch) => {
+  dispatch({type: COMPONENTS_FETCH_REQUEST_PENDING})
+
+  return DecoClient.getComponents()
+  .then(components => dispatch({type: COMPONENTS_FETCH_REQUEST_SUCCESS, payload: components}))
+  .catch(() => dispatch({type: COMPONENTS_FETCH_REQUEST_FAILURE}))
 }
 
-export const LOAD_COMPONENT_METADATA = 'LOAD_COMPONENT_METADATA'
-export const loadComponent = (componentInfo, metadata) => {
-  return {
-    type: LOAD_COMPONENT_METADATA,
-    name: componentInfo.name,
-    module: componentInfo.module,
-    metadata,
-  }
+export const createComponent = () => (dispatch) => {
+  dispatch({type: COMPONENT_CREATE_REQUEST_PENDING})
+
+  return DecoClient.createComponent()
+  .then(component => {
+    dispatch({type: COMPONENT_CREATE_REQUEST_SUCCESS, payload: component})
+    return component
+  })
+  .catch(() => dispatch({type: COMPONENT_CREATE_REQUEST_FAILURE}))
 }
 
-function _importComponent(projectRoot, componentName) {
-  return {
-    type: IMPORT_COMPONENT,
-    projectRoot,
-    componentName,
-  }
-}
-export function importComponent(componentInfo) {
-  return (dispatch, getState) => {
-    const state = getState()
-    ga('send', {
-      hitType: 'event',
-      eventCategory: 'Component',
-      eventAction: 'insert',
-      eventValue: componentInfo.name,
-    })
-    if (state.metadata.components.localComponents[componentInfo.name]) {
-      return Promise.resolve()
-    }
-    if (componentInfo.module) {
-      return Promise.resolve()
-    }
-    return request(_importComponent(state.directory.rootPath, componentInfo.name))
-  }
+export const updateComponent = (component) => (dispatch) => {
+  dispatch({type: COMPONENT_UPDATE_REQUEST_PENDING, payload: component})
+
+  return DecoClient.updateComponent(component)
+  .then(() => dispatch({type: COMPONENT_UPDATE_REQUEST_SUCCESS, payload: component}))
+  .catch(() => dispatch({type: COMPONENT_UPDATE_REQUEST_FAILURE}))
 }
 
-function _getComponentList() {
-  return {
-    type: GET_COMPONENT_LIST,
-  }
-}
-export function getComponentList() {
-  return (dispatch, getState) => {
-    request(_getComponentList()).then((resp) => {
-      dispatch(_onComponentList(resp.componentList))
-    })
-  }
+export const deleteComponent = (component) => (dispatch) => {
+  dispatch({type: COMPONENT_DELETE_REQUEST_PENDING, payload: component})
+
+  return DecoClient.deleteComponent(component)
+  .then(() => dispatch({type: COMPONENT_DELETE_REQUEST_SUCCESS, payload: component}))
+  .catch(() => dispatch({type: COMPONENT_DELETE_REQUEST_FAILURE}))
 }

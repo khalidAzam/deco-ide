@@ -54,6 +54,19 @@ const styles = {
     background: 'linear-gradient(#80D064, #63B846)',
     boxShadow: '0 0 0 1px #5CA941 inset, 0 1px 1px rgba(0,0,0,0.1)',
   },
+  destructiveBase: {
+    background: 'linear-gradient(#DC6C6C,#B24646)',
+    boxShadow: '0 0 0 1px #A94141 inset, 0 1px 1px rgba(0,0,0,0.1)',
+    color: 'white',
+  },
+  destructiveHover: {
+    background: 'linear-gradient(#B24646, #B24646)',
+    boxShadow: '0 0 0 1px #A94141 inset, 0 1px 1px rgba(0,0,0,0.1)',
+  },
+  destructiveActive: {
+    background: 'linear-gradient(#DC6C6C, #DC6C6C)',
+    boxShadow: '0 0 0 1px #A94141 inset, 0 1px 1px rgba(0,0,0,0.1)',
+  },
   inner: {
     flex: 1,
     display: 'flex',
@@ -95,6 +108,10 @@ export default class extends Component {
       base = {...styles.base, ...styles.mainBase}
       hover = styles.mainHover
       active = styles.mainActive
+    } else if (type === 'destructive') {
+      base = {...styles.base, ...styles.destructiveBase}
+      hover = styles.destructiveHover
+      active = styles.destructiveActive
     }
 
     return (
