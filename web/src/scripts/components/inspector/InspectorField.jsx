@@ -20,6 +20,7 @@ import React, { Component } from 'react'
 
 import FormRow from '../forms/FormRow'
 import Menu from '../menu/Menu'
+import FormHeaderPlusButton from '../forms/FormHeaderPlusButton'
 
 const INPUT_WIDTH = 115
 
@@ -96,7 +97,7 @@ export default class extends Component {
   }
 
   render() {
-    const {name, inset, width, inputElement, menuElement, deletable, onDelete} = this.props
+    const {name, inset, width, inputElement, menuElement, deletable, onDelete, addable, onAdd} = this.props
     const {showMenu, caretOffset, menuPosition, hover} = this.state
 
     return (
@@ -118,6 +119,9 @@ export default class extends Component {
         <div style={styles.inputElement}>
           {inputElement}
         </div>
+        {addable && (
+          <FormHeaderPlusButton onClick={onAdd} />
+        )}
         {deletable && (
           <div style={styles.removeProperty} onClick={onDelete} />
         )}

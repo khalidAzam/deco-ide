@@ -26,6 +26,7 @@ const styles = {
     fontSize: 16,
     fontWeight: 300,
     cursor: 'default',
+    marginLeft: 8,
   },
   default: {
     opacity: 1,

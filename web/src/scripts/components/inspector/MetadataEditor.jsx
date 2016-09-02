@@ -148,6 +148,17 @@ class MetadataEditor extends Component {
               onSubmit={requestClose}
             />
         </FormRow>}
+        {! disabledKeys['type'] && <FormRow
+            key={'type'}
+            label={'Type'}
+            inputWidth={INPUT_WIDTH}>
+            <SelectInput
+              value={metadata.type}
+              width={INPUT_WIDTH}
+              options={_.map(PrimitiveTypes)}
+              onChange={onMetadataChange.bind(null, 'type')}
+            />
+        </FormRow>}
         {! disabledKeys['group'] && <FormRow
             key={'group'}
             label={groupNameInProgress !== null ? '↵ to confirm' : 'Group'}

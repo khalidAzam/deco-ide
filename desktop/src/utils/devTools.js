@@ -3,7 +3,7 @@ import fs from 'fs'
 import electron from 'electron'
 const { BrowserWindow } = electron
 
-const REACT_EXT_PATH = '/Library/Application Support/Google/Chrome/Default/Extensions/fmkadmapgofadopljbjfkapdkoienihi/0.14.11_0'
+const REACT_EXT_PATH = '/Library/Application Support/Google/Chrome/Default/Extensions/fmkadmapgofadopljbjfkapdkoienihi/0.15.4_0'
 
 export default () => {
 

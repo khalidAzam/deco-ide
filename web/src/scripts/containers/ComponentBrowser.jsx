@@ -44,33 +44,19 @@ const SEARCHBAR_HEIGHT = 38
 
 class ComponentBrowser extends Component {
   render() {
+    const {componentList} = this.props
+
     return (
       <div className={'project-navigator vbox ' + this.props.className}
         style={style}>
         <PaneHeader text={'Components'} />
         <div style={innerStyle}>
           <FilterableList
-            items={this.props.componentList}
-            onItemClick={() => {}}
-            renderItem={(item, i) => {
-              return (
-                <DraggableComponentMenuItem
-                  name={item.name}
-                  author={item.publisher}
-                  description={item.description}
-                  badges={item.tags || []}
-                  image={item.thumbnail}
-                  index={i}
-                  item={item} />
-              )
-            }}
+            ItemComponent={DraggableComponentMenuItem}
+            items={componentList}
+            onSelectItem={(item) => {console.log('select item', item)}}
             autoSelectFirst={false}
-            width={this.props.width}
-            innerStyle={{
-              overflowY: 'auto',
-              maxHeight: this.props.height - PANE_HEADER_HEIGHT - SEARCHBAR_HEIGHT,
-              width: this.props.width,
-            }} />
+          />
         </div>
       </div>
     )
@@ -82,10 +68,8 @@ ComponentBrowser.defaultProps = {
   style: {},
 }
 
-const mapStateToProps = (state) => {
-  return {
-    componentList: state.modules.modules,
-  }
-}
+const mapStateToProps = (state) => ({
+  componentList: state.components.list,
+})
 
 export default connect(mapStateToProps)(ComponentBrowser)

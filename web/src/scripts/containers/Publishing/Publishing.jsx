@@ -59,8 +59,6 @@ class Publishing extends Component {
     const currentComponent = currentComponentId ?
       _.find(components, ['id', currentComponentId]) : null
 
-    console.log(currentComponent)
-
     return (
       <div style={styles.container}>
         <PaneHeader

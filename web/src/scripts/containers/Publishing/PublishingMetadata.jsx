@@ -21,6 +21,7 @@ import { connect } from 'react-redux'
 
 import DecoClient from '../../api/DecoClient'
 import { createJSX } from '../../factories/module/TemplateFactory'
+import PrimitiveTypes from '../../constants/PrimitiveTypes'
 
 import {
   FormRow,
@@ -71,6 +72,35 @@ const styles = {
   }
 }
 
+const castType = (value, oldType, newType) => {
+  try {
+    switch (newType) {
+      case PrimitiveTypes.BOOLEAN: return !!value
+      case PrimitiveTypes.NUMBER: {
+        const parsed = parseFloat(value)
+        return isNaN(parsed) ? 0 : parsed
+      }
+      case PrimitiveTypes.STRING: return value.toString()
+      case PrimitiveTypes.OBJECT: return []
+      case PrimitiveTypes.ARRAY: return []
+      case PrimitiveTypes.FUNCTION: return value.toString()
+      case PrimitiveTypes.RAW: return value.toString()
+    }
+  } catch (e) {
+    switch (newType) {
+      case PrimitiveTypes.BOOLEAN: return false
+      case PrimitiveTypes.NUMBER: return 0
+      case PrimitiveTypes.STRING: return ''
+      case PrimitiveTypes.OBJECT: return []
+      case PrimitiveTypes.ARRAY: return []
+      case PrimitiveTypes.FUNCTION: return '() => {}'
+      case PrimitiveTypes.RAW: return ''
+    }
+  }
+
+  return null
+}
+
 class PublishingMetadata extends Component {
   constructor(props) {
     super()
@@ -93,7 +123,7 @@ class PublishingMetadata extends Component {
           return `import { ${value.join(', ')} } from '${key}'`
         }
       }).join('\n'),
-      createJSX({name: tagName, props}),
+      createJSX({tagName, props}),
     ]
 
     return (
@@ -243,9 +273,10 @@ class PublishingMetadata extends Component {
             />
           </FormHeader>
           {componentProps.map((prop, i) => {
-            const {name, defaultValue: value} = prop
+            const {name, defaultValue: value, type} = prop
+            const isObject = type === PrimitiveTypes.OBJECT
 
-            return (
+            const elements = [(
               <LiveValue
                 key={i}
                 id={name}
@@ -254,12 +285,64 @@ class PublishingMetadata extends Component {
                 width={width}
                 inset={INSET_WIDTH}
                 disabledFields={['group']}
+                addable={isObject}
                 deletable={true}
                 onChange={(value) => this.updateComponent(c => c.props[i].defaultValue = value)}
-                onMetadataChange={(key, value) => this.updateComponent(c => c.props[i][key] = value)}
+                onMetadataChange={(key, newValue) => {
+                  this.updateComponent(c => {
+                    c.props[i][key] = newValue
+                    if (key === 'type') {
+                      const previousValue = c.props[i].defaultValue
+                      c.props[i].defaultValue = castType(previousValue, value, newValue)
+                    }
+                  })
+                }}
                 onDelete={(value) => this.updateComponent(c => c.props.splice(i, 1))}
+                onAdd={() => {
+                  this.updateComponent(c => {
+                    c.props[i].defaultValue = c.props[i].defaultValue || []
+                    c.props[i].defaultValue.push({
+                      name: 'hello',
+                      type: 'string',
+                      editWith: 'inputField',
+                      defaultValue: 'world',
+                    })
+                  })
+                }}
               />
-            )
+            )]
+
+            if (isObject) {
+              _.each(value, (oProp, oi) => {
+                const {name, defaultValue: value, type} = oProp
+
+                elements.push(
+                  <LiveValue
+                    key={i + '-' + oi}
+                    id={name}
+                    value={value}
+                    metadata={oProp}
+                    width={width}
+                    inset={INSET_WIDTH * 2}
+                    disabledFields={['group']}
+                    deletable={true}
+                    onChange={(value) => this.updateComponent(c => c.props[i].defaultValue[oi].defaultValue = value)}
+                    onMetadataChange={(key, newValue) => {
+                      this.updateComponent(c => {
+                        c.props[i].defaultValue[oi][key] = newValue
+                        if (key === 'type') {
+                          const previousValue = c.props[i].defaultValue[oi].defaultValue
+                          c.props[i].defaultValue[oi].defaultValue = castType(previousValue, value, newValue)
+                        }
+                      })
+                    }}
+                    onDelete={(value) => this.updateComponent(c => c.props[i].defaultValue.splice(oi, 1))}
+                  />
+                )
+              })
+            }
+
+            return _.flatten(elements)
           })}
           <div style={{marginBottom: 20}} />
           <FormHeader label={'DEPENDENCIES'}>

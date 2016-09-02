@@ -297,32 +297,22 @@ class TabbedEditor extends Component {
             )
           }
           <SearchMenu
+            ItemComponent={ComponentMenuItem}
             items={this.props.componentList}
-            renderItem={(item, i) => {
-              return (
-                <ComponentMenuItem
-                  name={item.name}
-                  author={item.publisher}
-                  description={item.description}
-                  badges={item.tags || []}
-                  image={item.thumbnail}
-                  index={i} />
-              )
-            }}
             onItemClick={this.onImportItem.bind(this)}
             show={this.state.showMenu}
             anchorPosition={this.state.menuPosition}
             requestClose={() => {
-                //delay allows key events to finish first?
-                //TODO: move search menu to top level and take care of this on that refactor
-                setTimeout(() => {
-                  this.refs.editor.getDecoratedComponentInstance().focus()
-                }, 200)
-                this.setState({
-                  showMenu: false,
-                })
-              }
-            }/>
+              //delay allows key events to finish first?
+              //TODO: move search menu to top level and take care of this on that refactor
+              setTimeout(() => {
+                this.refs.editor.getDecoratedComponentInstance().focus()
+              }, 200)
+              this.setState({
+                showMenu: false,
+              })
+            }}
+          />
         </div>
       </HotKeys>
     )
@@ -351,7 +341,7 @@ const mapStateToProps = (state, ownProps) => {
   return {
     module: module,
     projectRoot: state.directory.rootPath,
-    componentList: state.modules.modules,
+    componentList: state.components.list,
     consoleVisible: state.ui.consoleVisible,
     packagerOutput: state.application.packagerOutput,
     packagerStatus: state.application.packagerStatus,

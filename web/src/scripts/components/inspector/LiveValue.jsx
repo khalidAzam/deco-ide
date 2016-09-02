@@ -53,12 +53,13 @@ export default class extends Component {
   }
 
   render() {
-    const {id, value, metadata, onChange, onMetadataChange, onDelete, deletable, disabledFields, inset, width} = this.props
+    const {id, value, metadata, onChange, onMetadataChange, deletable, onDelete, addable, onAdd, disabledFields, inset, width} = this.props
     const {name} = metadata
 
     let inputElement
 
     switch (metadata.type) {
+      case PrimitiveTypes.RAW:
       case PrimitiveTypes.STRING:
         switch (metadata.editWith) {
           case EDIT_WITH.COLOR_PICKER:
@@ -135,6 +136,8 @@ export default class extends Component {
         inset={inset}
         width={width}
         inputElement={inputElement}
+        addable={addable}
+        onAdd={onAdd}
         deletable={deletable}
         onDelete={onDelete}
         menuElement={(
