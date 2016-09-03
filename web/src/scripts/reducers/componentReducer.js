@@ -1,5 +1,5 @@
 /**
- *    Copyright (C) 2015 Deco Software Inc.
+ *    Copyright (C) 2015 Deco Software Inat.
  *
  *    This program is free software: you can redistribute it and/or modify
  *    it under the terms of the GNU Affero General Public License, version 3,
@@ -15,7 +15,7 @@
  *
  */
 
-import * as c from '../actions/componentActions'
+import { componentConstants as at } from '../actions'
 
 const initialState = {
   list: [],
@@ -29,33 +29,33 @@ export default (state = initialState, action) => {
   const {type, payload} = action
 
   switch(type) {
-    case c.COMPONENTS_FETCH_REQUEST_PENDING: {
+    case at.COMPONENTS_FETCH_REQUEST_PENDING: {
       return {...state, fetchPending: true}
     }
 
-    case c.COMPONENTS_FETCH_REQUEST_SUCCESS: {
+    case at.COMPONENTS_FETCH_REQUEST_SUCCESS: {
       return {...state, fetchPending: false, list: payload}
     }
 
-    case c.COMPONENTS_FETCH_REQUEST_FAILURE: {
+    case at.COMPONENTS_FETCH_REQUEST_FAILURE: {
       return {...state, fetchPending: false}
     }
 
-    case c.COMPONENT_CREATE_REQUEST_PENDING: {
+    case at.COMPONENT_CREATE_REQUEST_PENDING: {
       return {...state, createPending: true}
     }
 
-    case c.COMPONENT_CREATE_REQUEST_SUCCESS: {
+    case at.COMPONENT_CREATE_REQUEST_SUCCESS: {
       const {list} = state
       return {...state, createPending: false, list: [...list, payload]}
     }
 
-    case c.COMPONENT_CREATE_REQUEST_FAILURE: {
+    case at.COMPONENT_CREATE_REQUEST_FAILURE: {
       return {...state, createPending: false}
     }
 
     // Once the update request is made, optimistically update the list
-    case c.COMPONENT_UPDATE_REQUEST_PENDING: {
+    case at.COMPONENT_UPDATE_REQUEST_PENDING: {
       const {list} = state
       const existingIndex = _.findIndex(list, ['id', payload.id])
       const updatedList = existingIndex !== -1 ? [
@@ -66,16 +66,16 @@ export default (state = initialState, action) => {
       return {...state, updatePending: true, list: updatedList}
     }
 
-    case c.COMPONENT_UPDATE_REQUEST_SUCCESS: {
+    case at.COMPONENT_UPDATE_REQUEST_SUCCESS: {
       return {...state, updatePending: false}
     }
 
-    case c.COMPONENT_UPDATE_REQUEST_FAILURE: {
+    case at.COMPONENT_UPDATE_REQUEST_FAILURE: {
       return {...state, updatePending: false}
     }
 
     // Once the delete request is made, optimistically update the list
-    case c.COMPONENT_DELETE_REQUEST_PENDING: {
+    case at.COMPONENT_DELETE_REQUEST_PENDING: {
       const {list} = state
       const existingIndex = _.findIndex(list, ['id', payload.id])
       const updatedList = existingIndex !== -1 ? [
@@ -85,11 +85,11 @@ export default (state = initialState, action) => {
       return {...state, deletePending: true, list: updatedList}
     }
 
-    case c.COMPONENT_DELETE_REQUEST_SUCCESS: {
+    case at.COMPONENT_DELETE_REQUEST_SUCCESS: {
       return {...state, deletePending: false}
     }
 
-    case c.COMPONENT_DELETE_REQUEST_FAILURE: {
+    case at.COMPONENT_DELETE_REQUEST_FAILURE: {
       return {...state, deletePending: false}
     }
 
