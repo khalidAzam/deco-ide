@@ -26,6 +26,7 @@ import uiReducer from './uiReducer'
 import preferencesReducer from './preferencesReducer'
 import modules from './moduleReducer'
 import components from './componentReducer'
+import auth from './authReducer'
 
 const rootReducer = combineReducers({
   directory: fileReducer,
@@ -38,6 +39,7 @@ const rootReducer = combineReducers({
   preferences: preferencesReducer,
   modules,
   components,
+  auth,
 })
 
 export default rootReducer

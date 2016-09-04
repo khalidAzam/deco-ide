@@ -1,5 +1,5 @@
 /**
- *    Copyright (C) 2015 Deco Software Inc.
+ *    Copyright (C) 2015 Deco Software Inat.
  *
  *    This program is free software: you can redistribute it and/or modify
  *    it under the terms of the GNU Affero General Public License, version 3,
@@ -15,32 +15,32 @@
  *
  */
 
-import React, { Component, } from 'react'
+import { authConstants as at } from '../actions'
 
-import InspectorButton from './InspectorButton'
-import GithubIcon from '../display/GithubIcon'
+const initialState = {
+  token: null,
+  authPending: false,
+}
 
-export default class extends Component {
+export default (state = initialState, action) => {
+  const {type, payload} = action
 
-  static propTypes = {}
+  switch(type) {
+    case at.AUTH_PENDING: {
+      return {...state, authPending: true}
+    }
 
-  static defaultProps = {}
+    case at.AUTH_FAILURE: {
+      return {...state, authPending: false}
+    }
 
-  constructor(props) {
-    super(props)
+    case at.AUTH_SUCCESS: {
+      const {code} = payload
+      return {...state, authPending: false, token: code}
+    }
 
-    this.state = {}
-  }
-
-  render() {
-    const {children} = this.props
-
-    return (
-      <InspectorButton {...this.props}>
-        <GithubIcon />
-        <div style={{marginRight: 6}} />
-        {'Sign in with GitHub'}
-      </InspectorButton>
-    )
+    default: {
+      return state
+    }
   }
 }

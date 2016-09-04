@@ -33,7 +33,9 @@ const styles = {
   }
 }
 
-const SignIn = ({}) => {
+const SignIn = (props) => {
+  const {onClickSignIn} = props
+
   return (
     <div style={styles.container}>
       <Callout isTop={true}>
@@ -42,7 +44,7 @@ const SignIn = ({}) => {
         Deco makes it extremely quick and easy to publish components to <b>GitHub</b> and <b>npm</b> for use in your other projects, by your team, and by other React Native developers.
       </Callout>
       <div style={styles.inner}>
-        <LoginButton />
+        <LoginButton onClick={onClickSignIn} />
       </div>
     </div>
   )

@@ -18,13 +18,16 @@
 import React, { Component, } from 'react'
 import _ from 'lodash'
 import { connect } from 'react-redux'
+import { bindActionCreators } from 'redux'
+import { createSelector } from 'reselect'
 
 import PublishingSignIn from './PublishingSignIn'
 import PublishingBrowser from './PublishingBrowser'
 import PublishingMetadata from './PublishingMetadata'
-import {PaneHeader} from '../../components'
+import { PaneHeader } from '../../components'
 import DecoClient from '../../api/DecoClient'
-import { fetchComponents, createComponent, updateComponent, deleteComponent } from '../../actions/componentActions'
+
+import { componentActions, authActions } from '../../actions'
 
 const styles = {
   container: {
@@ -39,17 +42,62 @@ const styles = {
   }
 }
 
-class Publishing extends Component {
-  constructor(props) {
-    const {dispatch} = props
+const mapStateToProps = (state) => createSelector(
+  (state) => state.components.list,
+  (state) => state.auth.token,
+  (components, token) => ({
+    components,
+    signedIn: !!token,
+    user: {
+      username: 'dabbott',
+      firstname: 'Devin',
+      lastname: 'Abbott',
+      thumbnail: 'https://avatars0.githubusercontent.com/u/1198882?v=3&s=460',
+    },
+  })
+)
 
+const mapDispatchToProps = (dispatch) => ({
+  componentActions: bindActionCreators(componentActions, dispatch),
+  authActions: bindActionCreators(authActions, dispatch),
+})
+
+class Publishing extends Component {
+
+  state = {
+    currentComponentId: null,
+  }
+
+  constructor(props) {
     super()
 
-    this.state = {
-      currentComponentId: null,
-    }
+    props.componentActions.fetchComponents()
+  }
 
-    dispatch(fetchComponents())
+  updateComponent = (component) => {
+    this.props.componentActions.updateComponent(component)
+  }
+
+  deleteComponent = (component) => {
+    this.props.componentActions.deleteComponent(component)
+      .then(() => this.setState({currentComponentId: null}))
+  }
+
+  selectComponent = (currentComponentId) => {
+    this.setState({currentComponentId})
+  }
+
+  createComponent = () => {
+    this.props.componentActions.createComponent()
+      .then(component => {
+        const {id} = component
+
+        this.setState({currentComponentId: id})
+      })
+  }
+
+  signIn = () => {
+    this.props.authActions.authenticate()
   }
 
   render() {
@@ -78,48 +126,25 @@ class Publishing extends Component {
               user={user}
               component={currentComponent}
               width={width}
-              onUpdateComponent={(component) => dispatch(updateComponent(component))}
-              onDeleteComponent={(component) => {
-                dispatch(deleteComponent(component))
-                  .then(() => this.setState({currentComponentId: null}))
-              }}
+              onUpdateComponent={this.updateComponent}
+              onDeleteComponent={this.deleteComponent}
             />
           ) : (
             <PublishingBrowser
               user={user}
               components={components}
-              onSelectComponent={(currentComponentId) => {
-                this.setState({currentComponentId})
-              }}
-              onCreateComponent={() => {
-                dispatch(createComponent())
-                  .then(component => {
-                    const {id} = component
-
-                    this.setState({currentComponentId: id})
-                  })
-              }}
+              onSelectComponent={this.selectComponent}
+              onCreateComponent={this.createComponent}
             />
           )
         ) : (
-          <PublishingSignIn />
+          <PublishingSignIn
+            onClickSignIn={this.signIn}
+          />
         )}
       </div>
     )
   }
 }
 
-const mapStateToProps = (state) => {
-  return {
-    components: state.components.list,
-    signedIn: true,
-    user: {
-      username: 'dabbott',
-      firstname: 'Devin',
-      lastname: 'Abbott',
-      thumbnail: 'https://avatars0.githubusercontent.com/u/1198882?v=3&s=460',
-    },
-  }
-}
-
-export default connect(mapStateToProps)(Publishing)
+export default connect(mapStateToProps, mapDispatchToProps)(Publishing)

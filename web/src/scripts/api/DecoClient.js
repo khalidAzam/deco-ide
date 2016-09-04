@@ -1,9 +1,11 @@
 import _ from 'lodash'
 
 import HTTPClient from './HTTPClient'
+import PopupUtils from '../utils/PopupUtils'
 
 // const BASE = 'http://decowsstaging.herokuapp.com'
-const BASE = 'http://localhost:8000'
+// const BASE = 'http://localhost:8000'
+const BASE = 'http://decows.deco.ngrok.io'
 const http = new HTTPClient(BASE)
 
 const defaultComponent = {
@@ -62,5 +64,23 @@ export default class {
     }
 
     return http.delete(`/components/${id}`)
+  }
+
+  static authenticate() {
+    const url = http.createUrl('/credentials')
+
+    return PopupUtils.open(url, {
+      width: 1060,
+      height: 620,
+      titleBarStyle: 'default',
+      resizable: true,
+      scrollbars: true,
+    }, (location) => {
+      const match = location.match(/code=(.*)/)
+
+      if (match) {
+        return {code: match[1]}
+      }
+    })
   }
 }
