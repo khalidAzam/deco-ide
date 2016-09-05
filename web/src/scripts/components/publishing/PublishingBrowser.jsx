@@ -15,10 +15,10 @@
  *
  */
 
-import React, { Component, } from 'react'
-import { connect } from 'react-redux'
+import React, { Component } from 'react'
 
-import {UserDetailsBanner, InspectorButton} from '../../components'
+import InspectorButton from '../buttons/InspectorButton'
+import UserDetailsBanner from '../user/UserDetailsBanner'
 
 const styles = {
   container: {
@@ -46,7 +46,7 @@ const styles = {
   },
 }
 
-const PublishingBrowser = ({user, components, onSelectComponent, onCreateComponent}) => {
+export default ({user, components, onSelectComponent, onCreateComponent}) => {
   const {name, username, thumbnail} = user
   const downloadCount = components.reduce((sum, component) => sum + (component.downloads || 0), 0)
 
@@ -80,5 +80,3 @@ const PublishingBrowser = ({user, components, onSelectComponent, onCreateCompone
     </div>
   )
 }
-
-export default connect()(PublishingBrowser)

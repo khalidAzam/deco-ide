@@ -21,13 +21,8 @@ import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import { createSelector } from 'reselect'
 
-import PublishingSignIn from './PublishingSignIn'
-import PublishingBrowser from './PublishingBrowser'
-import PublishingMetadata from './PublishingMetadata'
-import { PaneHeader } from '../../components'
-import DecoClient from '../../api/DecoClient'
-
 import { componentActions, userActions, publishingActions } from '../../actions'
+import { PaneHeader, PublishingSignIn, PublishingBrowser, PublishingMetadata } from '../../components'
 
 const styles = {
   container: {

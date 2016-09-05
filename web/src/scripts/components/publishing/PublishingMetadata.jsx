@@ -16,24 +16,19 @@
  */
 
 import _ from 'lodash'
-import React, { Component, } from 'react'
-import { connect } from 'react-redux'
+import React, { Component } from 'react'
 
-import DecoClient from '../../api/DecoClient'
 import { createJSX } from '../../factories/module/TemplateFactory'
 import PrimitiveTypes from '../../constants/PrimitiveTypes'
-
-import {
-  FormRow,
-  FormHeader,
-  FormHeaderPlusButton,
-  LiveValue,
-  InspectorButton,
-  InspectorField,
-  FileSelectorInput,
-  StringInput,
-  NameEditor,
-} from '../../components'
+import FormRow from '../forms/FormRow'
+import FormHeader from '../forms/FormHeader'
+import FormHeaderPlusButton from '../forms/FormHeaderPlusButton'
+import LiveValue from '../inspector/LiveValue'
+import InspectorButton from '../buttons/InspectorButton'
+import InspectorField from '../inspector/InspectorField'
+import FileSelectorInput from '../input/FileSelectorInput'
+import StringInput from '../input/StringInput'
+import NameEditor from '../inspector/NameEditor'
 
 const INPUT_WIDTH = 115
 const INSET_WIDTH = 15
@@ -101,7 +96,7 @@ const castType = (value, oldType, newType) => {
   return null
 }
 
-class PublishingMetadata extends Component {
+export default class extends Component {
   constructor(props) {
     super()
 
@@ -393,5 +388,3 @@ class PublishingMetadata extends Component {
     )
   }
 }
-
-export default connect()(PublishingMetadata)

@@ -16,9 +16,9 @@
  */
 
 import React, { Component, } from 'react'
-import { connect } from 'react-redux'
 
-import {LoginButton, Callout} from '../../components'
+import LoginButton from '../buttons/LoginButton'
+import Callout from '../display/Callout'
 
 const styles = {
   container: {
@@ -33,7 +33,7 @@ const styles = {
   }
 }
 
-const SignIn = (props) => {
+export default (props) => {
   const {onClickSignIn} = props
 
   return (
@@ -49,5 +49,3 @@ const SignIn = (props) => {
     </div>
   )
 }
-
-export default connect()(SignIn)
