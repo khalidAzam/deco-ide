@@ -45,18 +45,31 @@ const defaultComponent = {
   },
 }
 
+const localToRemote = (local) => {
+  const remote = _.cloneDeep(local)
+  delete remote.id
+  return remote
+}
+
+const remoteToLocal = (remote) => {
+  return {
+    ...remote.payload,
+    id: remote._id,
+    componentId: remote.componentId
+  }
+}
+
 export default class {
-  static getComponents() {
-    return http.get('/components')
-    .then(components => {
-      return components
-        .filter(c => c.componentId && c.payload)
-        .map(c => ({...c.payload, id: c.componentId}))
-    })
+  static async getComponents() {
+    const components = await http.get('/components')
+    return components
+      .filter(c => c.componentId && c.payload)
+      .map(remoteToLocal)
   }
 
-  static createComponent(component = defaultComponent, params) {
-    return http.post('/components', params, component)
+  static async createComponent(component = defaultComponent, params) {
+    const created = await http.post('/components', params, localToRemote(component))
+    return remoteToLocal(created)
   }
 
   static updateComponent(component, params) {
@@ -66,11 +79,7 @@ export default class {
       throw new Error('Cannot update component - missing id')
     }
 
-    // Remove id before sending
-    const clone = _.cloneDeep(component)
-    delete clone.id
-
-    return http.put(`/components/${id}`, params, clone)
+    return http.put(`/components/${id}`, params, localToRemote(component))
   }
 
   static deleteComponent(component, params) {

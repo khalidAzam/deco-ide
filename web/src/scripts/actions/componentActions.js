@@ -36,7 +36,7 @@ export const createComponent = () => async (dispatch, getState) => {
 
   try {
     const {token} = getState().user
-    const component = await DecoClient.createComponent({access_token: token})
+    const component = await DecoClient.createComponent(undefined, {access_token: token})
     dispatch({type: at.COMPONENT_CREATE_REQUEST_SUCCESS, payload: component})
     return component
   } catch (e) {
