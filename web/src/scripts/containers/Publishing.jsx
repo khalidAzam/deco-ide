@@ -21,8 +21,8 @@ import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import { createSelector } from 'reselect'
 
-import { componentActions, userActions, publishingActions } from '../../actions'
-import { PaneHeader, PublishingSignIn, PublishingBrowser, PublishingMetadata } from '../../components'
+import { componentActions, userActions, publishingActions } from '../actions'
+import { PaneHeader, PublishingSignIn, PublishingBrowser, PublishingMetadata } from '../components'
 
 const styles = {
   container: {
