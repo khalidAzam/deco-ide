@@ -49,17 +49,17 @@ export default class {
   static getComponents() {
     return http.get('/components')
     .then(components => {
-      return Object.keys(components).map(id => {
-        return {id, ...components[id]}
-      })
+      return components
+        .filter(c => c.componentId && c.payload)
+        .map(c => ({...c.payload, id: c.componentId}))
     })
   }
 
-  static createComponent(component = defaultComponent) {
-    return http.post('/components', null, component)
+  static createComponent(component = defaultComponent, params) {
+    return http.post('/components', params, component)
   }
 
-  static updateComponent(component) {
+  static updateComponent(component, params) {
     const {id} = component
 
     if (!id) {
@@ -70,17 +70,17 @@ export default class {
     const clone = _.cloneDeep(component)
     delete clone.id
 
-    return http.put(`/components/${id}`, null, clone)
+    return http.put(`/components/${id}`, params, clone)
   }
 
-  static deleteComponent(component) {
+  static deleteComponent(component, params) {
     const {id} = component
 
     if (!id) {
       throw new Error('Cannot update component - missing id')
     }
 
-    return http.delete(`/components/${id}`)
+    return http.delete(`/components/${id}`, params)
   }
 
   static me(params) {

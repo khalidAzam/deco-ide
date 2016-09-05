@@ -72,6 +72,7 @@ class Publishing extends Component {
     super()
 
     props.componentActions.fetchComponents()
+    props.userActions.fetchUserInfo()
   }
 
   createComponent = async () => {

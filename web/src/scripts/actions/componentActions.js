@@ -31,11 +31,12 @@ export const fetchComponents = () => async (dispatch) => {
   }
 }
 
-export const createComponent = () => async (dispatch) => {
+export const createComponent = () => async (dispatch, getState) => {
   dispatch({type: at.COMPONENT_CREATE_REQUEST_PENDING})
 
   try {
-    const component = await DecoClient.createComponent()
+    const {token} = getState().user
+    const component = await DecoClient.createComponent({access_token: token})
     dispatch({type: at.COMPONENT_CREATE_REQUEST_SUCCESS, payload: component})
     return component
   } catch (e) {

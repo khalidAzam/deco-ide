@@ -16,9 +16,10 @@
  */
 
 import { userConstants as at } from '../actions'
+import { getToken } from '../utils/AuthUtils'
 
 const initialState = {
-  token: null,
+  token: getToken(),
   githubId: null,
   name: null,
   thumbnail: null,
@@ -55,8 +56,8 @@ export default (state = initialState, action) => {
     }
 
     case at.USER_INFO_SUCCESS: {
-      const {name, login, avatar_url} = payload.providerData
-      return {...state, infoPending: false, name, githubId: login, thumbnail: avatar_url}
+      const {username} = payload.auth.github
+      return {...state, infoPending: false, githubId: username}
     }
 
     default: {
