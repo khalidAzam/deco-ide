@@ -35,7 +35,7 @@ const style = {
 const LABEL_WIDTH = 140
 const INSET_LEVEL = 15
 
-export default ({onPreferenceChange, setSystemLocationPreference, androidHome, pathToGenymotionApp, useGenymotion}) => {
+export default ({onPreferenceChange, setSystemLocationPreference, androidHome, pathToGenymotionApp, useGenymotion, publishingFeature}) => {
   return (
     <div style={style}>
       <FormRow
@@ -53,6 +53,13 @@ export default ({onPreferenceChange, setSystemLocationPreference, androidHome, p
           value={pathToGenymotionApp}
           onClickButton={setSystemLocationPreference.bind(null, PREFERENCES.GENERAL.GENYMOTION_APP, 'openFile', 'Choose Genymotion Install Location')}
           placeholder={METADATA[CATEGORIES.GENERAL][PREFERENCES[CATEGORIES.GENERAL].GENYMOTION_APP].defaultValue} />
+      </FormRow>
+      <FormRow
+        label={'Enable Experimental Component Publishing'}
+        labelWidth={LABEL_WIDTH}>
+        <CheckboxInput
+          value={publishingFeature}
+          onChange={onPreferenceChange.bind(null, PREFERENCES.GENERAL.PUBLISHING_FEATURE)} />
       </FormRow>
     </div>
   )
