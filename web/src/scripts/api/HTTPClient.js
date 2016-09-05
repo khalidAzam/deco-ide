@@ -1,3 +1,20 @@
+/**
+ *    Copyright (C) 2015 Deco Software Inc.
+ *
+ *    This program is free software: you can redistribute it and/or modify
+ *    it under the terms of the GNU Affero General Public License, version 3,
+ *    as published by the Free Software Foundation.
+ *
+ *    This program is distributed in the hope that it will be useful,
+ *    but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *    GNU Affero General Public License for more details.
+ *
+ *    You should have received a copy of the GNU Affero General Public License
+ *    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+
 export default class {
   constructor(baseUrl) {
     this.baseUrl = baseUrl
@@ -45,5 +62,35 @@ export default class {
       method: 'DELETE',
       headers: this.defaultHeaders,
     })
+  }
+
+  static parseQueryString(url) {
+    const params = {}
+    const query = url.split('?')[1]
+
+    if (!query) {
+      return params
+    }
+
+    const components = query.split("&")
+
+    components.forEach(component => {
+      const pair = component.split("=")
+      const key = decodeURIComponent(pair[0])
+      const value = decodeURIComponent(pair[1])
+
+      // Param may exist - there are potentially multiple with the same name
+      const existing = params[key]
+
+      if (typeof existing === 'undefined') {
+        params[key] = value
+      } else if (typeof existing === 'string') {
+        params[key] = [existing, value]
+      } else {
+        params[key].push(value)
+      }
+    })
+
+    return params
   }
 }

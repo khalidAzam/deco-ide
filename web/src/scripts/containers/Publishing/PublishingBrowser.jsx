@@ -47,14 +47,13 @@ const styles = {
 }
 
 const PublishingBrowser = ({user, components, onSelectComponent, onCreateComponent}) => {
-  const {firstname, lastname, username, thumbnail} = user
+  const {name, username, thumbnail} = user
   const downloadCount = components.reduce((sum, component) => sum + (component.downloads || 0), 0)
 
   return (
     <div style={styles.container}>
       <UserDetailsBanner
-        firstname={firstname}
-        lastname={lastname}
+        name={name}
         username={username}
         thumbnail={thumbnail}
         componentCount={components.length}

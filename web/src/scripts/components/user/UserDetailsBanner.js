@@ -54,7 +54,7 @@ export default class extends Component {
   }
 
   render() {
-    const {firstname, lastname, username, thumbnail, componentCount, downloadCount} = this.props
+    const {name, username, thumbnail, componentCount, downloadCount} = this.props
     const thumbnailStyle = {backgroundImage: `url(${thumbnail})`}
 
     return (
@@ -62,7 +62,7 @@ export default class extends Component {
         <div style={{...styles.photo, ...thumbnailStyle}} />
         <div style={styles.description}>
           <div>
-            <b style={styles.username}>@{username}</b> ({firstname} {lastname})
+            <b style={styles.username}>@{username}</b> ({name})
           </div>
           <div>
             <span style={styles.blueText}>{componentCount} components</span>

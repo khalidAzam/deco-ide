@@ -1,5 +1,5 @@
 /**
- *    Copyright (C) 2015 Deco Software Inat.
+ *    Copyright (C) 2015 Deco Software Inc.
  *
  *    This program is free software: you can redistribute it and/or modify
  *    it under the terms of the GNU Affero General Public License, version 3,
@@ -15,28 +15,18 @@
  *
  */
 
-import { authConstants as at } from '../actions'
+import { publishingConstants as at } from '../actions'
 
 const initialState = {
-  token: null,
-  authPending: false,
+  currentComponentId: null,
 }
 
 export default (state = initialState, action) => {
   const {type, payload} = action
 
   switch(type) {
-    case at.AUTH_PENDING: {
-      return {...state, authPending: true}
-    }
-
-    case at.AUTH_FAILURE: {
-      return {...state, authPending: false}
-    }
-
-    case at.AUTH_SUCCESS: {
-      const {code} = payload
-      return {...state, authPending: false, token: code}
+    case at.SET_CURRENT_COMPONENT: {
+      return {...state, currentComponentId: payload}
     }
 
     default: {

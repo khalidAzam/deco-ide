@@ -27,7 +27,7 @@ import PublishingMetadata from './PublishingMetadata'
 import { PaneHeader } from '../../components'
 import DecoClient from '../../api/DecoClient'
 
-import { componentActions, authActions } from '../../actions'
+import { componentActions, userActions, publishingActions } from '../../actions'
 
 const styles = {
   container: {
@@ -43,30 +43,35 @@ const styles = {
 }
 
 const mapStateToProps = (state) => createSelector(
-  (state) => state.components.list,
-  (state) => state.auth.token,
-  (components, token) => ({
-    components,
-    signedIn: !!token,
+  ({components}) => ({
+    components: components.list
+  }),
+  ({user}) => ({
+    signedIn: !!user.token,
     user: {
-      username: 'dabbott',
-      firstname: 'Devin',
-      lastname: 'Abbott',
-      thumbnail: 'https://avatars0.githubusercontent.com/u/1198882?v=3&s=460',
+      name: user.name,
+      thumbnail: user.thumbnail,
+      username: user.githubId,
     },
+  }),
+  ({ui: {publishing}}) => ({
+    currentComponentId: publishing.currentComponentId
+  }),
+  (components, user, publishing) => ({
+    ...components,
+    ...user,
+    currentComponent: publishing.currentComponentId ?
+      _.find(components.components, ['id', publishing.currentComponentId]) : null
   })
 )
 
 const mapDispatchToProps = (dispatch) => ({
+  publishingActions: bindActionCreators(publishingActions, dispatch),
   componentActions: bindActionCreators(componentActions, dispatch),
-  authActions: bindActionCreators(authActions, dispatch),
+  userActions: bindActionCreators(userActions, dispatch),
 })
 
 class Publishing extends Component {
-
-  state = {
-    currentComponentId: null,
-  }
 
   constructor(props) {
     super()
@@ -74,51 +79,47 @@ class Publishing extends Component {
     props.componentActions.fetchComponents()
   }
 
+  createComponent = async () => {
+    const {id} = await this.props.componentActions.createComponent()
+    this.props.publishingActions.setCurrentComponent(id)
+  }
+
   updateComponent = (component) => {
     this.props.componentActions.updateComponent(component)
   }
 
   deleteComponent = (component) => {
+    this.props.publishingActions.setCurrentComponent(null)
     this.props.componentActions.deleteComponent(component)
-      .then(() => this.setState({currentComponentId: null}))
   }
 
   selectComponent = (currentComponentId) => {
-    this.setState({currentComponentId})
+    this.props.publishingActions.setCurrentComponent(currentComponentId)
   }
 
-  createComponent = () => {
-    this.props.componentActions.createComponent()
-      .then(component => {
-        const {id} = component
-
-        this.setState({currentComponentId: id})
-      })
+  deselectCurrentComponent = () => {
+    this.props.publishingActions.setCurrentComponent(null)
   }
 
   signIn = () => {
-    this.props.authActions.authenticate()
+    this.props.userActions.signIn()
+  }
+
+  signOut = () => {
+    this.props.userActions.signOut()
   }
 
   render() {
-    const {currentComponentId} = this.state
-    const {dispatch, components, signedIn, user, width} = this.props
-
-    const currentComponent = currentComponentId ?
-      _.find(components, ['id', currentComponentId]) : null
+    const {currentComponent, components, signedIn, user, width} = this.props
 
     return (
       <div style={styles.container}>
         <PaneHeader
           text={'Publishing'}
           leftTitle={currentComponent ? 'Back' : null}
-          onClickLeftTitle={(() => {
-            this.setState({currentComponentId: null})
-          })}
+          onClickLeftTitle={this.deselectCurrentComponent}
           rightTitle={signedIn ? 'Sign out' : null}
-          onClickRightTitle={() => {
-            console.log('Sign out?')
-          }}
+          onClickRightTitle={this.signOut}
         />
         {signedIn ? (
           currentComponent ? (
